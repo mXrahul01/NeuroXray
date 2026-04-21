@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Processing Report | Chest Module</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --bg-panel: rgba(15, 23, 42, 0.5);
+            --accent-cyan: #06b6d4;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.08);
+
+            /* Risk Colors */
+            --danger-bg: rgba(239, 68, 68, 0.08);
+            --danger-text: #f87171;
+            --safe-bg: rgba(16, 185, 129, 0.08);
+            --safe-text: #34d399;
+            --warn-text: #fbbf24;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* Premium Navbar */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100;
+        }
+        .nav-brand { font-size: 1.4rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .nav-brand i { color: var(--accent-cyan); }
+        .btn-nav {
+            background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); padding: 10px 20px;
+            border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            border: 1px solid rgba(6, 182, 212, 0.3); transition: 0.3s;
+        }
+        .btn-nav:hover { background: var(--accent-cyan); color: #fff; }
+
+        /* Header Section */
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 5%; width: 100%; flex: 1; animation: slideUp 0.6s ease-out; }
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .page-title h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 5px; }
+        .page-title p { color: var(--text-muted); font-size: 1rem; }
+
+        /* Controls */
+        .controls { display: flex; gap: 15px; align-items: center; }
+        .search-box { position: relative; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-box input {
+            background: var(--bg-panel); border: 1px solid var(--glass-border); color: #fff;
+            padding: 12px 15px 12px 40px; border-radius: 12px; outline: none; transition: 0.3s;
+            width: 250px; font-family: 'Outfit';
+        }
+        .search-box input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
+
+        .btn-export {
+            background: transparent; color: #cbd5e1; border: 1px solid var(--glass-border);
+            padding: 12px 20px; border-radius: 12px; cursor: pointer; text-decoration: none;
+            font-weight: 500; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-export:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
+        /* Advanced Results Table */
+        .table-card {
+            background: var(--bg-panel); border: 1px solid var(--glass-border);
+            border-radius: 20px; overflow-x: auto; backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); max-height: 65vh; overflow-y: auto;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+
+        /* Sticky Header */
+        th {
+            background: rgba(15, 23, 42, 0.95); padding: 20px 25px; font-weight: 600;
+            color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase;
+            letter-spacing: 1px; border-bottom: 1px solid var(--glass-border);
+            position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+        }
+
+        td { padding: 18px 25px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #cbd5e1; font-weight: 400; transition: background 0.2s; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.04); }
+
+        /* Risk Row Highlights */
+        tr.danger-row { background: linear-gradient(90deg, var(--danger-bg), transparent); border-left: 3px solid var(--danger-text); }
+        tr.safe-row { background: linear-gradient(90deg, var(--safe-bg), transparent); border-left: 3px solid var(--safe-text); }
+
+        .filename { font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .filename i { color: #64748b; font-size: 1.2rem; }
+
+        /* Modern Badges */
+        .badge { padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-danger { background: var(--danger-bg); color: var(--danger-text); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge-safe { background: var(--safe-bg); color: var(--safe-text); border: 1px solid rgba(16, 185, 129, 0.2); }
+
+        .sub-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* Empty State */
+        .empty-state { padding: 80px 20px; text-align: center; color: var(--text-muted); }
+        .empty-state i { font-size: 4rem; color: rgba(255,255,255,0.05); margin-bottom: 20px; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .page-header { flex-direction: column; align-items: flex-start; } .controls { width: 100%; flex-wrap: wrap; } .search-box input { width: 100%; } }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-brand"><i class="fas fa-layer-group"></i> Batch Triage Dashboard</div>
+    <a href="/chest/upload_bulk" class="btn-nav"><i class="fas fa-upload"></i> Upload New Batch</a>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <div class="page-title">
+            <h1>Chest X-ray Batch Report</h1>
+            <p>Automated LNN screening results, sorted by critical anomaly priority.</p>
+        </div>
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="tableSearch" placeholder="Search filename or diagnosis...">
+            </div>
+            <a href="{{ url_for('download_report', module='chest', batch_id=batch_id) }}" class="btn-export" download>
+                <i class="fas fa-file-csv"></i> Export Data
+            </a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table id="resultsTable">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Scan Identifier</th>
+                <th>M1: Pneumonia</th>
+                <th>M2: Lung Opacity</th>
+                <th>Final Master Verdict</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if not results %}
+            <tr>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h2>No Scans Processed</h2>
+                        <p>Upload a directory of Chest X-rays to generate the batch report.</p>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            {% for result in results %}
+            <tr class="result-row {% if result['final_prediction'] != 'Normal' %}danger-row{% else %}safe-row{% endif %}">
+                <td style="color: #64748b; font-weight: 600;">{{ loop.index }}</td>
+                <td>
+                    <div class="filename">
+                        <i class="fas fa-file-image"></i> {{ result['filename'] }}
+                    </div>
+                </td>
+
+                <td>
+                    <div style="font-weight:500; color:{% if result['prediction1'] != 'Normal' %}var(--danger-text){% else %}#cbd5e1{% endif %};">
+                        {{ result['prediction1'] }}
+                    </div>
+                    <div class="sub-text">Conf: {{ "%.1f"|format(result['confidence1'] * 100) }}%</div>
+                </td>
+
+                <td>
+                    <div style="font-weight:500; color:{% if result['prediction2'] != 'Normal' %}var(--danger-text){% else %}#cbd5e1{% endif %};">
+                        {{ result['prediction2'] }}
+                    </div>
+                    <div class="sub-text">Conf: {{ "%.1f"|format(result['confidence2'] * 100) }}%</div>
+                </td>
+
+                <td>
+                    {% if result['final_prediction'] != 'Normal' %}
+                    <span class="badge badge-danger"><i class="fas fa-exclamation-circle"></i> {{ result['final_prediction'] }}</span>
+                    {% else %}
+                    <span class="badge badge-safe"><i class="fas fa-check"></i> {{ result['final_prediction'] }}</span>
+                    {% endif %}
+                    <div class="sub-text" style="margin-top:6px;">Aggr. Conf: {{ "%.1f"|format(result['final_confidence'] * 100) }}%</div>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.getElementById('tableSearch').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('.result-row');
+
+        rows.forEach(row => {
+            let filename = row.cells[1].textContent.toLowerCase();
+            let m1 = row.cells[2].textContent.toLowerCase();
+            let m2 = row.cells[3].textContent.toLowerCase();
+            let finalDiag = row.cells[4].textContent.toLowerCase();
+
+            if (filename.includes(filter) || m1.includes(filter) || m2.includes(filter) || finalDiag.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+</body>
+</html>

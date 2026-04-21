@@ -1,0 +1,8 @@
+torch~=2.9.0
+torchvision~=0.24.0
+uuid~=1.30
+opencv-python~=4.8.1.78
+numpy~=1.26.4
+pillow~=10.4.0
+Flask~=3.1.2
+Werkzeug~=3.1.3

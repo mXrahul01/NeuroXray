@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic AI Report | Chest Module</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --bg-panel: rgba(15, 23, 42, 0.4);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.4);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.2);
+            --safe: #10b981;
+            --safe-glow: rgba(16, 185, 129, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Background */
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.15), transparent 60%);
+        }
+
+        /* Premium Navbar */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; background: rgba(3, 7, 18, 0.7);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
+        }
+        .nav-brand { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .nav-brand i { color: var(--accent-cyan); }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: var(--text-main); }
+
+        /* Layout */
+        .container { max-width: 1200px; margin: 0 auto; padding: 50px 5%; width: 100%; animation: fadeUp 0.8s ease-out; }
+        .header { text-align: center; margin-bottom: 50px; }
+        .header h1 { font-size: 2.8rem; font-weight: 800; margin-bottom: 10px; }
+        .header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        /* Dual Image Grid */
+        .visual-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; margin-bottom: 40px;
+        }
+        .image-card {
+            background: var(--bg-panel); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 25px; text-align: center;
+            backdrop-filter: blur(15px); transition: 0.4s; position: relative;
+        }
+        .image-card:hover { transform: translateY(-5px); border-color: rgba(6, 182, 212, 0.4); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .image-card h3 { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px; letter-spacing: 1px; }
+        .image-card img { width: 100%; max-width: 400px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.6); transition: transform 0.5s; }
+        .image-card:hover img { transform: scale(1.03); }
+
+        /* Multi-Model Diagnosis Panel */
+        .models-container { display: flex; gap: 30px; flex-wrap: wrap; margin-bottom: 30px; }
+        .model-box {
+            flex: 1; min-width: 280px; background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border); padding: 25px; border-radius: 16px;
+        }
+        .model-box h4 { color: var(--text-muted); margin-bottom: 15px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .conf-row { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 8px; font-size: 1.1rem; }
+        .progress-bg { background: rgba(255,255,255,0.05); height: 10px; border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 20px; background: var(--accent-cyan); box-shadow: 0 0 15px var(--accent-cyan-glow); transition: width 1.5s ease-out 0.5s; width: 0; }
+
+        /* Final Verdict Panel */
+        .final-panel {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(20px); border-left: 5px solid var(--accent-cyan);
+        }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 12px;
+            font-size: 2.2rem; font-weight: 800; padding: 12px 25px; border-radius: 16px;
+        }
+        .status-danger { background: var(--danger-glow); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-safe { background: var(--safe-glow); color: var(--safe); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .final-score { text-align: right; }
+        .final-score p { color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .final-score h2 { font-size: 3rem; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
+
+        /* Action Buttons */
+        .action-area { display: flex; justify-content: center; gap: 20px; margin-top: 50px; }
+        .btn {
+            padding: 15px 35px; border-radius: 30px; font-weight: 600; font-size: 1.05rem;
+            text-decoration: none; transition: 0.3s; display: flex; align-items: center; gap: 10px;
+        }
+        .btn-primary { background: linear-gradient(90deg, var(--accent-cyan), #0891b2); color: #fff; box-shadow: 0 10px 20px var(--accent-cyan-glow); border: none; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(6, 182, 212, 0.5); }
+        .btn-outline { background: transparent; border: 2px solid var(--glass-border); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1); }
+
+        .disclaimer { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 50px; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .final-panel { flex-direction: column; text-align: center; } .final-score { text-align: center; } .action-area { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<div class="ambient-bg"></div>
+
+<nav>
+    <div class="nav-brand"><i class="fas fa-lungs"></i> NeuroXray LNN</div>
+    <div class="nav-links">
+        <a href="/chest"><i class="fas fa-arrow-left"></i> Back to Hub</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="header">
+        <h1>AI Diagnostic Report</h1>
+        <p>Liquid Neural Network Spatial Analysis & Inference Results</p>
+    </div>
+
+    <div class="visual-grid">
+        <div class="image-card">
+            <h3><i class="fas fa-x-ray" style="color:var(--text-muted); margin-right:8px;"></i> Original Radiograph</h3>
+            <img src="{{ image_path }}" alt="Original Chest X-ray">
+        </div>
+        <div class="image-card" style="border-top: 1px solid rgba(6, 182, 212, 0.3);">
+            <h3><i class="fas fa-fire" style="color:var(--accent-cyan); margin-right:8px;"></i> LNN Grad-CAM Heatmap</h3>
+            <img src="{{ heatmap_path }}" alt="AI Occlusion Heatmap">
+        </div>
+    </div>
+
+    <div class="models-container">
+        <div class="model-box">
+            <h4><i class="fas fa-virus"></i> Model 1: Pneumonia</h4>
+            <div class="conf-row">
+                <span style="color: {% if pred1 != 'Normal' %}var(--danger){% else %}var(--safe){% endif %};">{{ pred1 }}</span>
+                <span>{{ "%.2f"|format(conf1 * 100) }}%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" style="width: {{ conf1 * 100 }}%;"></div></div>
+        </div>
+        <div class="model-box">
+            <h4><i class="fas fa-lungs-virus"></i> Model 2: Lung Opacity</h4>
+            <div class="conf-row">
+                <span style="color: {% if pred2 != 'Normal' %}var(--danger){% else %}var(--safe){% endif %};">{{ pred2 }}</span>
+                <span>{{ "%.2f"|format(conf2 * 100) }}%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" style="width: {{ conf2 * 100 }}%; background: #0891b2;"></div></div>
+        </div>
+    </div>
+
+    <div class="final-panel">
+        <div>
+            <p style="color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Master Classification Verdict</p>
+            {% if final_label != 'Normal' %}
+            <div class="status-badge status-danger">
+                <i class="fas fa-exclamation-triangle"></i> {{ final_label }}
+            </div>
+            {% else %}
+            <div class="status-badge status-safe">
+                <i class="fas fa-check-circle"></i> {{ final_label }}
+            </div>
+            {% endif %}
+        </div>
+        <div class="final-score">
+            <p>Aggregated AI Confidence</p>
+            <h2>{{ "%.2f"|format(final_conf * 100) }}<span style="font-size: 1.5rem; color: var(--accent-cyan);">%</span></h2>
+        </div>
+    </div>
+
+    <div class="action-area">
+        <a href="/chest/upload_single" class="btn btn-primary"><i class="fas fa-upload"></i> Analyze New Scan</a>
+        <a href="/chest" class="btn btn-outline"><i class="fas fa-home"></i> Back to Chest Hub</a>
+    </div>
+
+    <p class="disclaimer">
+        <i class="fas fa-shield-alt"></i> Clinical Disclaimer: This AI tool is designed for assistive screening purposes only. Always consult a certified radiologist for final diagnosis.
+    </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroXray | Dual-Mode AI Medical Diagnosis</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* CSS Variables for Premium Palette */
+        :root {
+            --bg-deep: #050b14;
+            --bg-secondary: #0a1324;
+            --accent-teal: #00e5ff;
+            --accent-teal-glow: rgba(0, 229, 255, 0.4);
+            --accent-purple: #b388ff;
+            --accent-purple-glow: rgba(179, 136, 255, 0.4);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Global Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Gradients */
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-teal-glow) 0%, transparent 70%);
+            top: -200px;
+            left: -200px;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: floatGlow 10s infinite alternate;
+        }
+        .bg-glow-2 {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-purple-glow) 0%, transparent 70%);
+            bottom: -200px;
+            right: -200px;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: floatGlow 12s infinite alternate-reverse;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(5, 11, 20, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--accent-teal); }
+
+        /* General Section Styling */
+        section { padding: 100px 5%; position: relative; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        .text-gradient {
+            background: linear-gradient(to right, var(--accent-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+        .hero-btns {
+            display: flex;
+            gap: 20px;
+        }
+        .btn {
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-teal), #007bb5);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(0, 229, 255, 0.4);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 10px 20px rgba(179, 136, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* Modules Section */
+        .modules-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .module-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.05), transparent);
+            z-index: -1;
+        }
+        .module-card.chest:hover {
+            transform: translateY(-15px);
+            border-color: var(--accent-teal);
+            box-shadow: 0 20px 40px rgba(0, 229, 255, 0.15);
+        }
+        .module-card.brain:hover {
+            transform: translateY(-15px);
+            border-color: var(--accent-purple);
+            box-shadow: 0 20px 40px rgba(179, 136, 255, 0.15);
+        }
+        .icon-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 30px;
+            transition: transform 0.5s ease;
+        }
+        .chest .icon-box { background: rgba(0, 229, 255, 0.1); color: var(--accent-teal); }
+        .brain .icon-box { background: rgba(179, 136, 255, 0.1); color: var(--accent-purple); }
+
+        .module-card:hover .icon-box { transform: scale(1.1) rotate(5deg); }
+
+        .module-card h3 { font-size: 2rem; margin-bottom: 15px; }
+        .module-card p { color: var(--text-muted); margin-bottom: 35px; font-size: 1.05rem; }
+
+        .btn-module {
+            display: inline-block;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        .chest .btn-module {
+            background: transparent;
+            border: 2px solid var(--accent-teal);
+            color: var(--accent-teal);
+        }
+        .chest .btn-module:hover { background: var(--accent-teal); color: var(--bg-deep); }
+
+        .brain .btn-module {
+            background: transparent;
+            border: 2px solid var(--accent-purple);
+            color: var(--accent-purple);
+        }
+        .brain .btn-module:hover { background: var(--accent-purple); color: var(--bg-deep); }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .feature-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+        .feature-item:hover { transform: translateY(-10px); background: #0c1830; }
+        .feature-item i {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--accent-teal), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .feature-item h4 { font-size: 1.3rem; margin-bottom: 10px; }
+        .feature-item p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* About Section */
+        .about-section {
+            background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-secondary) 100%);
+            border-top: 1px solid var(--glass-border);
+        }
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+        .about-content p { margin-bottom: 20px; }
+
+        /* Footer */
+        footer {
+            background: #02050a;
+            padding: 40px 5%;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+        }
+        .footer-text { color: #64748b; font-size: 0.9rem; }
+        .social-links { margin-top: 20px; display: flex; justify-content: center; gap: 15px; }
+        .social-links a { color: #64748b; font-size: 1.2rem; transition: color 0.3s; }
+        .social-links a:hover { color: var(--text-main); }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .hero-btns { flex-direction: column; width: 100%; max-width: 300px; }
+            .nav-links { display: none; /* Add a hamburger menu later if needed */ }
+            .module-card { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-glow-2"></div>
+
+<nav>
+    <div class="logo">
+        <i class="fas fa-microscope"></i> NeuroXray
+    </div>
+    <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#modules">Diagnosis Hub</a>
+        <a href="#features">Features</a>
+        <a href="#about">Technology</a>
+    </div>
+</nav>
+
+<section id="home" class="hero">
+    <h1 class="reveal">Next-Gen <span class="text-gradient">Medical AI</span><br>Diagnostic Hub</h1>
+    <p class="reveal" style="transition-delay: 0.1s;">Empowering healthcare professionals with state-of-the-art Deep Learning models for ultra-accurate Chest X-ray and Brain MRI anomaly detection.</p>
+    <div class="hero-btns reveal" style="transition-delay: 0.2s;">
+        <a href="#modules" class="btn btn-primary"><i class="fas fa-rocket"></i> Launch Modules</a>
+        <a href="#about" class="btn btn-outline"><i class="fas fa-info-circle"></i> View Architecture</a>
+    </div>
+</section>
+
+<section id="modules">
+    <div class="section-header reveal">
+        <h2 class="section-title">Select Diagnosis Module</h2>
+        <p class="section-subtitle">Choose the imaging modality to begin AI-powered analysis.</p>
+    </div>
+
+    <div class="modules-container">
+        <div class="module-card chest reveal">
+            <div class="icon-box">
+                <i class="fas fa-lungs"></i>
+            </div>
+            <h3>Chest X-ray</h3>
+            <p>Advanced Liquid Neural Network (LNN) detecting Pneumonia and Lung Opacities with integrated Grad-CAM heatmaps.</p>
+            <a href="{{ url_for('chest_index') }}" class="btn-module">Access Chest Module</a>
+        </div>
+
+        <div class="module-card brain reveal" style="transition-delay: 0.2s;">
+            <div class="icon-box">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3>Brain MRI</h3>
+            <p>High-precision Convolutional Architecture designed to identify and localize brain tumors in MRI scans.</p>
+            <a href="{{ url_for('brain_index') }}" class="btn-module">Access Brain Module</a>
+        </div>
+    </div>
+</section>
+
+<section id="features">
+    <div class="section-header reveal">
+        <h2 class="section-title">Why Use NeuroXray?</h2>
+        <p class="section-subtitle">Engineered for clinical precision, speed, and reliability.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-item reveal">
+            <i class="fas fa-network-wired"></i>
+            <h4>Dual Architecture</h4>
+            <p>Combines Liquid Neural Networks (LNN) for chest scans and Best-in-Class models for brain MRIs to prevent feature interference.</p>
+        </div>
+        <div class="feature-item reveal" style="transition-delay: 0.1s;">
+            <i class="fas fa-fire"></i>
+            <h4>Heatmap Localization</h4>
+            <p>Not just predictions—our Grad-CAM visualization shows exactly where the AI detects abnormalities in the scan.</p>
+        </div>
+        <div class="feature-item reveal" style="transition-delay: 0.2s;">
+            <i class="fas fa-bolt"></i>
+            <h4>Real-time Processing</h4>
+            <p>Lazy-loaded models ensure maximum memory efficiency and lightning-fast inference times for both single and bulk uploads.</p>
+        </div>
+        <div class="feature-item reveal" style="transition-delay: 0.3s;">
+            <i class="fas fa-shield-alt"></i>
+            <h4>Secure & Private</h4>
+            <p>Images are processed strictly within the server environment. Upload directories are securely isolated and automatically cleaned.</p>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="about-section">
+    <div class="section-header reveal">
+        <h2 class="section-title">The Technology</h2>
+    </div>
+    <div class="about-content reveal">
+        <p><strong>NeuroXray</strong> represents a leap forward in assistive diagnostic tools. By utilizing an isolated, parallel architecture, we ensure that models run independently without memory hallucination or resource contention.</p>
+        <p>Our Chest X-ray module utilizes bleeding-edge <strong>Liquid Neural Networks (LNN)</strong>, renowned for adapting to continuous data streams, providing high accuracy for Pneumonia and Lung Opacity. The Brain MRI module operates via a dedicated pathway optimized specifically for neurological grayscale imaging.</p>
+    </div>
+</section>
+
+<footer>
+    <p class="footer-text">&copy; 2026 NeuroXray Intelligent Healthcare System. All rights reserved.</p>
+    <div class="social-links">
+        <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+        <a href="#"><i class="fas fa-envelope"></i></a>
+    </div>
+</footer>
+
+<script>
+    function reveal() {
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+            var windowHeight = window.innerHeight;
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            var elementVisible = 100;
+            if (elementTop < windowHeight - elementVisible) {
+                reveals[i].classList.add("active");
+            }
+        }
+    }
+    window.addEventListener("scroll", reveal);
+    // Trigger once on load
+    reveal();
+</script>
+</body>
+</html>

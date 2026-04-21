@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDEs
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Runtime-generated outputs
+static/reports/
+static/heatmaps/
+
+# Optional: large model files (uncomment if you don't want to commit weights)
+# models/**/*.pth
+# models/**/*.pt
+# models/**/*.onnx
+

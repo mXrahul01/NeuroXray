@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Single Scan | NeuroXray</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --bg-panel: rgba(15, 23, 42, 0.5);
+            --accent-purple: #a855f7;
+            --accent-purple-glow: rgba(168, 85, 247, 0.4);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+        /* Ambient Glow Background */
+        .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.1), transparent 60%); }
+
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; background: rgba(3, 7, 18, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
+        .nav-brand { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .nav-brand i { color: var(--accent-purple); }
+        .back-btn { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .back-btn:hover { color: var(--text-main); }
+
+        /* Container & Card */
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; animation: fadeUp 0.8s ease-out; }
+        .upload-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.6));
+            border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight);
+            border-radius: 24px; padding: 50px; width: 100%; max-width: 650px;
+            text-align: center; backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .upload-header { margin-bottom: 30px; }
+        .upload-header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; }
+        .upload-header p { color: var(--text-muted); font-size: 1.05rem; }
+
+        /* Dropzone */
+        .dropzone {
+            border: 2px dashed rgba(168, 85, 247, 0.5); border-radius: 16px;
+            padding: 60px 20px; background: rgba(168, 85, 247, 0.03);
+            cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .dropzone.dragover { background: rgba(168, 85, 247, 0.1); border-color: var(--accent-purple); box-shadow: 0 0 30px var(--accent-purple-glow); }
+        .dropzone i { font-size: 3.5rem; color: var(--accent-purple); margin-bottom: 15px; transition: 0.3s; }
+        .dropzone:hover i { transform: translateY(-5px); }
+        .dropzone h3 { font-size: 1.3rem; margin-bottom: 8px; font-weight: 600; }
+        .dropzone p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px; }
+
+        .format-chips { display: flex; justify-content: center; gap: 10px; }
+        .chip { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; color: #cbd5e1; }
+
+        .file-input { display: none; }
+
+        /* File Display */
+        .file-display {
+            display: none; margin-top: 25px; padding: 15px 20px;
+            background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .file-info { display: flex; align-items: center; gap: 12px; color: #fff; font-weight: 500; }
+        .file-info i { color: var(--accent-purple); font-size: 1.4rem; }
+        .remove-file { color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .remove-file:hover { color: #ef4444; }
+
+        /* Submit Button */
+        .btn-submit {
+            margin-top: 35px; width: 100%; padding: 16px; border-radius: 14px;
+            background: linear-gradient(90deg, var(--accent-purple), #9333ea);
+            color: #fff; border: none; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px var(--accent-purple-glow);
+            opacity: 0.5; pointer-events: none; /* Disabled until file is selected */
+        }
+        .btn-submit.active { opacity: 1; pointer-events: all; }
+        .btn-submit.active:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(168, 85, 247, 0.5); }
+
+        /* Trust Badges */
+        .trust-badges { display: flex; justify-content: center; gap: 30px; margin-top: 40px; }
+        .trust-badge { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.9rem; }
+        .trust-badge i { color: var(--accent-purple); }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="ambient-bg"></div>
+
+<nav>
+    <a href="/brain" class="back-btn"><i class="fas fa-arrow-left"></i> Brain Hub</a>
+    <div class="nav-brand"><i class="fas fa-brain"></i> NeuroXray</div>
+</nav>
+
+<div class="container">
+    <div class="upload-card">
+        <div class="upload-header">
+            <h1>Analyze Single Scan</h1>
+            <p>Upload a high-resolution MRI image for spatial deep learning inference.</p>
+        </div>
+
+        <form action="/brain/upload_single" method="post" enctype="multipart/form-data" id="uploadForm">
+
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Click or drag MRI scan here</h3>
+                <p>Maximum file size 256MB</p>
+                <div class="format-chips">
+                    <span class="chip">PNG</span>
+                    <span class="chip">JPG</span>
+                    <span class="chip">JPEG</span>
+                </div>
+            </div>
+
+            <input type="file" id="fileInput" name="image" class="file-input" accept=".png, .jpg, .jpeg" required>
+
+            <div class="file-display" id="fileDisplay" style="display: none;">
+                <div class="file-info">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span id="fileName">scan_001.png</span>
+                </div>
+                <i class="fas fa-times remove-file" id="removeFile" title="Remove File"></i>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-microscope mr-2"></i> Generate Diagnosis & Heatmap
+            </button>
+        </form>
+    </div>
+
+    <div class="trust-badges">
+        <div class="trust-badge"><i class="fas fa-lock"></i> Encrypted Transfer</div>
+        <div class="trust-badge"><i class="fas fa-bolt"></i> Real-time Inference</div>
+        <div class="trust-badge"><i class="fas fa-eye"></i> Grad-CAM Visuals</div>
+    </div>
+</div>
+
+<script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileDisplay = document.getElementById('fileDisplay');
+    const fileName = document.getElementById('fileName');
+    const removeFile = document.getElementById('removeFile');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Handle Drag & Drop styles
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+    });
+
+    // Handle Drop
+    dropzone.addEventListener('drop', (e) => {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        if (files.length > 0) {
+            fileInput.files = files; // Assign files to input
+            updateUI(files[0].name);
+        }
+    });
+
+    // Handle Click Upload
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            updateUI(this.files[0].name);
+        }
+    });
+
+    // Remove File
+    removeFile.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent clicking dropzone
+        fileInput.value = '';
+        fileDisplay.style.display = 'none';
+        dropzone.style.display = 'block';
+        submitBtn.classList.remove('active');
+    });
+
+    function updateUI(name) {
+        fileName.textContent = name;
+        dropzone.style.display = 'none';
+        fileDisplay.style.display = 'flex';
+        submitBtn.classList.add('active');
+    }
+</script>
+</body>
+</html>

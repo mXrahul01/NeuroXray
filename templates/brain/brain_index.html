@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain MRI | Diagnostic Hub</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Premium Medical AI Theme Variables */
+        :root {
+            --bg-deep: #030712;
+            --bg-secondary: #0f172a;
+            --accent-purple: #a855f7;
+            --accent-purple-light: #d8b4fe;
+            --accent-purple-glow: rgba(168, 85, 247, 0.35);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Ambient Animated Background */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            background:
+                    radial-gradient(circle at 15% 50%, rgba(168, 85, 247, 0.08), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.12), transparent 30%);
+            overflow: hidden;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--accent-purple-glow) 0%, transparent 60%);
+            top: -150px; left: 50%;
+            transform: translateX(-50%);
+            filter: blur(100px);
+            animation: breathe 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+            100% { transform: translateX(-50%) scale(1.2); opacity: 0.8; }
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: rgba(3, 7, 18, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-brand { font-size: 1.4rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 12px; }
+        .nav-brand i { color: var(--accent-purple); font-size: 1.6rem; }
+        .back-btn {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            color: var(--text-main);
+            background: var(--glass-bg);
+            border-color: var(--glass-border);
+        }
+
+        /* Main Container & Hero */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 5% 40px;
+            text-align: center;
+        }
+
+        .status-badge {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: var(--accent-purple-light);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeUp 0.6s ease-out;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            color: #fff;
+            animation: fadeUp 0.8s ease-out;
+        }
+        .title span {
+            background: linear-gradient(135deg, var(--accent-purple-light), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            max-width: 650px;
+            margin-bottom: 60px;
+            line-height: 1.6;
+            animation: fadeUp 1s ease-out;
+        }
+
+        /* Cards Grid */
+        .options-grid {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1000px;
+            animation: fadeUp 1.2s ease-out;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            text-align: left;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hover Scanning Effect */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 20px;
+            background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), transparent);
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(168, 85, 247, 0.15);
+        }
+
+        .card:hover::after {
+            opacity: 1;
+            animation: scanline 2s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { top: -50%; }
+            100% { top: 150%; }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card-icon {
+            font-size: 2.2rem;
+            color: var(--accent-purple-light);
+            background: rgba(168, 85, 247, 0.15);
+            width: 70px; height: 70px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 18px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.1);
+        }
+
+        .card h3 { font-size: 1.6rem; font-weight: 700; }
+        .card p { color: var(--text-muted); font-size: 1rem; margin-bottom: 25px; line-height: 1.6; flex-grow: 1; }
+
+        .feature-list { list-style: none; margin-bottom: 35px; }
+        .feature-list li {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-list li i { color: var(--accent-purple); font-size: 0.9rem; }
+
+        .btn-card {
+            background: linear-gradient(90deg, var(--accent-purple), #9333ea);
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.2);
+        }
+        .btn-card:hover {
+            box-shadow: 0 15px 25px rgba(168, 85, 247, 0.4);
+            transform: scale(1.02);
+            color: #fff;
+        }
+
+        /* Features Strip */
+        .features-strip {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 80px;
+            padding: 30px;
+            background: rgba(15, 23, 42, 0.3);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            width: 100vw;
+            animation: fadeUp 1.4s ease-out;
+        }
+        .strip-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+        .strip-item i { color: var(--accent-purple-light); font-size: 1.2rem; }
+
+        /* Footer */
+        footer { margin-top: auto; padding: 20px; color: var(--text-muted); font-size: 0.9rem; text-align: center; }
+
+        /* Initial Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; }
+            .card { padding: 30px; }
+            .features-strip { gap: 20px; flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ambient-bg">
+    <div class="ambient-glow"></div>
+</div>
+
+<nav>
+    <a href="{{ url_for('main_home') }}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Main Hub
+    </a>
+    <div class="nav-brand">
+        <i class="fas fa-brain"></i> NeuroXray
+    </div>
+</nav>
+
+<div class="container">
+    <div class="status-badge">
+        <div class="status-dot"></div> Systems Online | Vision CNN
+    </div>
+
+    <h1 class="title">Brain MRI <span>Inference Engine</span></h1>
+    <p class="subtitle">Select an analysis mode to initialize the neural network. Process a single scan for detailed spatial heatmaps, or upload a bulk directory for high-speed triage screening.</p>
+
+    <div class="options-grid">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-microscope"></i></div>
+                <h3>Single Scan</h3>
+            </div>
+            <p>Perform a deep-dive analysis on an individual patient's MRI scan to detect neuro-anomalies with high precision.</p>
+
+            <ul class="feature-list">
+                <li><i class="fas fa-check-circle"></i> Grad-CAM Heatmap Localization</li>
+                <li><i class="fas fa-check-circle"></i> Exact Confidence Scoring</li>
+                <li><i class="fas fa-check-circle"></i> Instant Visual Report</li>
+            </ul>
+
+            <a href="{{ url_for('brain_upload_single') }}" class="btn-card">
+                Initialize Single Engine <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>Batch Directory</h3>
+            </div>
+            <p>Deploy high-throughput automated screening. Upload an entire directory of MRI scans to prioritize patient anomalies.</p>
+
+            <ul class="feature-list">
+                <li><i class="fas fa-check-circle"></i> Up to 1000 Scans per Batch</li>
+                <li><i class="fas fa-check-circle"></i> Risk-Tier Priority Sorting</li>
+                <li><i class="fas fa-check-circle"></i> Downloadable CSV Reports</li>
+            </ul>
+
+            <a href="{{ url_for('brain_upload_bulk') }}" class="btn-card" style="background: linear-gradient(90deg, #334155, #475569);">
+                Initialize Batch Engine <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<div class="features-strip">
+    <div class="strip-item"><i class="fas fa-bolt"></i> Real-time Inference</div>
+    <div class="strip-item"><i class="fas fa-shield-alt"></i> Local Encrypted Processing</div>
+    <div class="strip-item"><i class="fas fa-chart-network"></i> Advanced CNN Architecture</div>
+    <div class="strip-item"><i class="fas fa-bullseye"></i> Clinical-Grade Accuracy</div>
+</div>
+
+<footer>
+    &copy; 2026 NeuroXray Systems. Powered by Deep Learning.
+</footer>
+
+</body>
+</html>
